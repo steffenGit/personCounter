@@ -1,3 +1,5 @@
+package personCounter;
+
 import org.opencv.core.Mat;
 
 

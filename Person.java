@@ -1,3 +1,5 @@
+package personCounter;
+
 
 public class Person {
 	int id;

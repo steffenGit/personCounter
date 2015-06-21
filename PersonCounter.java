@@ -1,3 +1,5 @@
+package personCounter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,15 @@ public class PersonCounter {
 			int filterSize, 
 			int adaptionFactor)
 	{
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	private void initialize(double threshold, 
+			double minArea, 
+			double maxDistance, 
+			int filterSize, 
+			int adaptionFactor)
+	{
 		this.threshold = threshold;
 		this.minArea = minArea;
 		this.maxDistance = maxDistance;
@@ -40,8 +51,33 @@ public class PersonCounter {
 		this.current.differenceGrey = null;
 		this.current.foregroundBW = null;
 		this.current.resultColor = null;
-		
 	}
+	
+	public void setThreshold(double threshold) {
+		this.threshold = threshold;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setMinArea(double minArea) {
+		this.minArea = minArea;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setMaxDistance(double maxDistance) {
+		this.maxDistance = maxDistance;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setFilterSize(int filterSize) {
+		this.filterSize = filterSize;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setAdaptionFactor(int adaptionFactor) {
+		this.adaptionFactor = adaptionFactor;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
 	public Mat getGrey(){
 		return this.current.grey;
 	}	

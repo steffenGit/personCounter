@@ -1,3 +1,5 @@
+package personCounter;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -13,6 +15,7 @@ public class Panel  extends JPanel{
 	
 	public void draw(Mat m)
 	{
+		
 		
 		int type = BufferedImage.TYPE_BYTE_GRAY;
 		if ( m.channels() > 1 ) {
