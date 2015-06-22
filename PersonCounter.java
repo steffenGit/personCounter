@@ -235,8 +235,7 @@ public class PersonCounter {
 				bbs.remove(minJ);
 				lonely.remove(i);
 			    Log.add("created");
-				Log.add(""+dx1);
-				Log.add(""+dx2);
+
 
 			}
 		}

@@ -1,4 +1,4 @@
-package personCounter;
+//package personCounter;
 
 import javax.swing.JTextField;
 
