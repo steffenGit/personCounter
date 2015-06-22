@@ -1,3 +1,5 @@
+//package personCounter;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.opencv.*;
@@ -28,6 +30,15 @@ public class PersonCounter {
 			int filterSize, 
 			double adaptionFactor)
 	{
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	private void initialize(double threshold, 
+			double minArea, 
+			double maxDistance, 
+			int filterSize, 
+			double adaptionFactor)
+	{
 		this.threshold = threshold;
 		this.minArea = minArea;
 		this.maxDistance = maxDistance;
@@ -44,8 +55,33 @@ public class PersonCounter {
 		this.current.resultColor = null;
 		
 		people = new ArrayList<Person>();
-		
 	}
+	
+	public void setThreshold(double threshold) {
+		this.threshold = threshold;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setMinArea(double minArea) {
+		this.minArea = minArea;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setMaxDistance(double maxDistance) {
+		this.maxDistance = maxDistance;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setFilterSize(int filterSize) {
+		this.filterSize = filterSize;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
+	public void setAdaptionFactor(int adaptionFactor) {
+		this.adaptionFactor = adaptionFactor;
+		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+	}
+	
 	public Mat getGrey(){
 		return this.current.grey;
 	}	
