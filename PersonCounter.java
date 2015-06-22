@@ -2,7 +2,6 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opencv.*;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -110,7 +109,7 @@ public class PersonCounter {
 		Imgproc.drawContours(this.current.resultColor, contours, -1, new Scalar(255,128,128), 1);
 		
 		// get their boundinboxes, with threshold
-		List<Rect> bbs = findBoundingBoxes(contours, 1800);
+		List<Rect> bbs = findBoundingBoxes(contours, 2200);
 				
 //		for(int i = 0; i < bbs.size(); i++)
 //		{
@@ -123,12 +122,15 @@ public class PersonCounter {
 			Imgproc.rectangle(this.current.resultColor, bbsIntersected.get(i).tl(), bbsIntersected.get(i).br(), new Scalar(255, 0,0),1);
 		}
 		
-		attachBBStoPeopleList(bbsIntersected, this.people);
-		Imgproc.putText(this.current.resultColor, "Total: " + Integer.toString(this.people.size()), new Point(15,25), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),1,1, false);
+		List<Person> single = attachBBStoPeopleList(bbsIntersected, this.people);
+		
+		System.out.println(" lonely " + Integer.toString(single.size()) + " bbs left " + Integer.toString(bbsIntersected.size()));
+		
+		Imgproc.putText(this.current.resultColor, "Total: " + Integer.toString(this.people.size()) + " lonely " + Integer.toString(single.size()) + " bbs left " + Integer.toString(bbsIntersected.size()), new Point(15,25), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),1,1, false);
 		
 		for(int i = 0; i < this.people.size(); i++)
 		{
-			Imgproc.putText(this.current.resultColor, Double.toString(people.get(i).id), new Point(people.get(i).boundingbox.tl().x, this.current.height - 20), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),1,1, false);
+			Imgproc.putText(this.current.resultColor, Integer.toString(people.get(i).id), new Point(people.get(i).boundingbox.tl().x, this.current.height - 20), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),1,1, false);
 			Imgproc.rectangle(this.current.resultColor, people.get(i).boundingbox.tl(), people.get(i).boundingbox.br(), new Scalar(0, 0,255),2);
 		}
 		
@@ -139,7 +141,7 @@ public class PersonCounter {
 	}
 	
 	
-	private void attachBBStoPeopleList(List<Rect> bbs, List<Person> people) {
+	private List<Person> attachBBStoPeopleList(List<Rect> bbs, List<Person> people) {
 		
 		List<Person> lonely = new ArrayList<Person>();
 		//System.out.println("before bbs " + bbs.size());
@@ -251,7 +253,7 @@ public class PersonCounter {
 			int dx2 = this.current.width - (lonely.get(j).boundingbox.x + lonely.get(j).boundingbox.width);
 			Log.add(""+dx2);
 
-			if((dx1 < 2 || dx2 < 2) && lonely.get(j).boundingbox.width < 100)
+			if((dx1 < 2 || dx2 < 2) && lonely.get(j).boundingbox.width < 200)
 			{
 				people.remove(lonely.get(j));
 				lonely.remove(j);
@@ -280,6 +282,8 @@ public class PersonCounter {
 			}
 			
 		}
+		
+		return lonely;
 	}
 	
 	
@@ -311,16 +315,16 @@ public class PersonCounter {
 		Imgproc.GaussianBlur(this.current.grey, this.current.grey, new Size(this.filterSize, this.filterSize), 0);		
 		
 		// adapt background		
-		for(int r = 0; r < this.current.grey.rows(); r++)
-		{
-			for(int c = 0; c < this.current.grey.cols(); c++)
-			{
-				if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
-					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor);
-				else
-					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor);
-			}
-		}
+//		for(int r = 0; r < this.current.grey.rows(); r++)
+//		{
+//			for(int c = 0; c < this.current.grey.cols(); c++)
+//			{
+//				if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
+//					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor);
+//				else
+//					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor);
+//			}
+//		}
 		
 		//get difference			
 		Core.absdiff(this.current.grey, this.current.backgroundGrey, this.current.differenceGrey);

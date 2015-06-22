@@ -22,6 +22,13 @@ public class VideoRunnable implements Runnable{
 		this.panel = panel;
 		m = new Mat();
 		vid = new VideoCapture(videoPath);
+//		vid = new VideoCapture(0);
+//		try {
+//			Thread.sleep(5000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		if (vid.isOpened())
 		System.out.println("file loaded");
 		pc = new PersonCounter(threshold, minArea, maxDistance, filterSize, adaptionFactor);

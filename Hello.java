@@ -23,13 +23,13 @@ public class Hello
 {
 	private static Thread videoThread;
 	private static VideoRunnable videoRunnable;
-	private static double currThreshold = 15;
-	private static double currMinArea = 100;
-	private static double currMaxDistance = 50;
-	private static int currFilterSize = 3;
-	private static int currAdaptionFactor = 4;
+	private static double currThreshold = 40;
+	private static double currMinArea = 700;
+	private static double currMaxDistance = 90;
+	private static int currFilterSize = 1;
+	private static int currAdaptionFactor = 0;
 	
-	private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/leute.mp4";
+	private static final String videoPathDefault = "/home/stfn/dev/eclipse/labor.mp4";
 	
 	private static JFrame window;
 	
