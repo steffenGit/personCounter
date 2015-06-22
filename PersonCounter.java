@@ -234,6 +234,9 @@ public class PersonCounter {
 				lonely.get(i).boundingbox = bbs.get(minJ).clone();
 				bbs.remove(minJ);
 				lonely.remove(i);
+			    Log.add("created");
+				Log.add(""+dx1);
+				Log.add(""+dx2);
 
 			}
 		}
@@ -242,18 +245,18 @@ public class PersonCounter {
 		//remove people
 		for(int j = 0; j < lonely.size(); j++)
 		{
-			System.out.println("remove");
+			Log.add("remove");
 			
 			int dx1 = lonely.get(j).boundingbox.x;
-			System.out.println(dx1);
+			Log.add(""+dx1);
 			int dx2 = this.current.width - (lonely.get(j).boundingbox.x + lonely.get(j).boundingbox.width);
-			System.out.println(dx2);
+			Log.add(""+dx2);
 
 			if((dx1 < 2 || dx2 < 2) && lonely.get(j).boundingbox.width < 100)
 			{
 				people.remove(lonely.get(j));
 				lonely.remove(j);
-				System.out.println("removed");
+				Log.add("removed");
 
 			}
 		}		
