@@ -7,6 +7,8 @@ import org.opencv.videoio.VideoCapture;
 
 public class VideoRunnable implements Runnable{
 
+	private String videoPath = "/home/jan/opencv_workspace/personCounter/leute.mp4";
+	
 	private double fps;
 	private boolean running = false;
 	private boolean stopped = false;
@@ -22,7 +24,7 @@ public class VideoRunnable implements Runnable{
 		this.frameRateTextField = frameRateTextField;
 		this.panel = panel;
 		m = new Mat();
-		vid = new VideoCapture("/home/jan/opencv_workspace/personCounter/leute.mp4");
+		vid = new VideoCapture(videoPath);
 		if (vid.isOpened())
 		System.out.println("file loaded");
 		pc = new PersonCounter(threshold, minArea, maxDistance, filterSize, adaptionFactor);
