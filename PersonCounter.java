@@ -207,9 +207,9 @@ public class PersonCounter {
 			int dx2 = this.current.width - (bbs.get(i).x + bbs.get(i).width);
 			if(dx1 < 3 || dx2 < 3)
 			{
-			    System.out.println("created");
-				System.out.println(dx1);
-				System.out.println(dx2);
+			    Log.add("created");
+				Log.add(""+dx1);
+				Log.add(""+dx2);
 
 				Person p = new Person();
 				p.id = this.id;
@@ -225,18 +225,18 @@ public class PersonCounter {
 		
 		for(int j = 0; j < lonely.size(); j++)
 		{
-			System.out.println("remove");
+			Log.add("remove");
 			
 			int dx1 = lonely.get(j).boundingbox.x;
-			System.out.println(dx1);
+			Log.add(""+dx1);
 			int dx2 = this.current.width - (lonely.get(j).boundingbox.x + lonely.get(j).boundingbox.width);
-			System.out.println(dx2);
+			Log.add(""+dx2);
 
 			if(dx1 < 2 || dx2 < 2)
 			{
 				people.remove(lonely.get(j));
 				lonely.remove(j);
-				System.out.println("removed");
+				Log.add("removed");
 
 			}
 		}		
