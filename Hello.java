@@ -1,4 +1,4 @@
-package personCounter;
+//package personCounter;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -67,11 +67,11 @@ public class Hello
 		
 		
 		//Change javas standard look and feel to the OS specific look and feel
-		try { 
+		/*try { 
 		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 		    e.printStackTrace();
-		}
+		}*/
 		
 		//initialize log so every component can write debug messages into log
 		Log.initialize();

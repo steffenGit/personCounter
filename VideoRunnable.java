@@ -1,4 +1,4 @@
-package personCounter;
+//package personCounter;
 
 import javax.swing.JTextField;
 
@@ -37,10 +37,13 @@ public class VideoRunnable implements Runnable{
 			if(!stopped && vid.read(m))
 			{
 				int c = pc.count(m);
-				Mat img = pc.getResultColor();
-				//Mat img = pc.getForegroundBW();
+				Mat img    = pc.getResultColor();
+				Mat imgFBW = pc.getForegroundBW();
+				Mat diff   = pc.getDifferenceGrey();
+				Mat grey   = pc.getGrey();
 				//Mat img = pc.test;
-				panel.draw(img);
+				
+				panel.draw(img, imgFBW, diff, grey);
 				fpsCounter++;
 			}
 			
