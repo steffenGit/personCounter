@@ -65,11 +65,16 @@ public class Hello
 		
 		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 		
+		
+		//Change javas standard look and feel to the OS specific look and feel
 		try { 
 		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}
+		
+		//initialize log so every component can write debug messages into log
+		Log.initialize();
 		
 		videoRunnable = null;
 		
@@ -79,12 +84,13 @@ public class Hello
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
 		
+		//create a top-level container for the window
 		container = new JPanel();
 		container.setLayout(new BorderLayout());
-		panel = new Panel();
+		panel = new Panel(); // the panel in the center of the screen (shows video)
 		
-		Log.initialize();
 		
+		//just some container for the different parts of the borderlayout
 		containerTop = new JPanel();
 		containerLeft = new JPanel();
 		containerRight = new JPanel();
@@ -92,6 +98,7 @@ public class Hello
 		containerLeft.setLayout(new BoxLayout(containerLeft, BoxLayout.PAGE_AXIS));
 		containerBottom.setLayout(new BoxLayout(containerBottom, BoxLayout.LINE_AXIS));
 		
+		//the file chooser to get a video path from the file system
 		videoPathLabel = new JLabel("Set Path to video");
 		videoPathTextField = new JTextField(videoPathDefault);
 		videoPathButton = new JButton("Choose File");
@@ -108,6 +115,7 @@ public class Hello
 			}
 		});
 		
+		//the information at the bottom of the window
 		personCounterLabel = new JLabel("Persons in Picture: ");
 		personCounterTextField = new JTextField(4);
 		personCounterTextField.setEditable(false);
@@ -115,6 +123,10 @@ public class Hello
 		frameRateTextField = new JTextField(4);
 		frameRateTextField.setEditable(false);
 		
+		
+		/********************************************************************
+		 * Add event listener to the different components
+		 *******************************************************************/
 		
 		thresholdGui = new LabeldSlider("Set Threshold", 0, 50, 15, 1, 5);
 		thresholdGui.getSlider().addChangeListener(new ChangeListener(){
@@ -199,6 +211,10 @@ public class Hello
 			}
 		});
 		
+		/*
+		 * Add all the components to the top level containers and then
+		 * add them to the window itself.
+		 */
 		
 		containerTop.add(videoPathLabel);
 		containerTop.add(videoPathTextField);
