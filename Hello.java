@@ -1,4 +1,4 @@
-//package personCounter;
+package personCounter;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -23,13 +23,13 @@ public class Hello
 {
 	private static Thread videoThread;
 	private static VideoRunnable videoRunnable;
-	private static double currThreshold = 15;
+	private static double currThreshold = 50;
 	private static double currMinArea = 100;
 	private static double currMaxDistance = 50;
 	private static int currFilterSize = 3;
 	private static int currAdaptionFactor = 4;
 	
-	private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/leute.mp4";
+	private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/steffenWand.mp4";
 	
 	private static JFrame window;
 	
