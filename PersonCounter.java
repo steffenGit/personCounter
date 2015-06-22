@@ -71,10 +71,10 @@ public class PersonCounter {
 
 		// get the contours of all shapes, with threshold
 		List<MatOfPoint> contours = findContours(this.current, this.minArea);
-		//Imgproc.drawContours(this.current.resultColor, contours, -1, new Scalar(255,128,128), 1);
+		Imgproc.drawContours(this.current.resultColor, contours, -1, new Scalar(255,128,128), 1);
 		
 		// get their boundinboxes, with threshold
-		List<Rect> bbs = findBoundingBoxes(contours, 3000);
+		List<Rect> bbs = findBoundingBoxes(contours, 1800);
 				
 //		for(int i = 0; i < bbs.size(); i++)
 //		{
@@ -107,10 +107,12 @@ public class PersonCounter {
 		
 		List<Person> lonely = new ArrayList<Person>();
 		//System.out.println("before bbs " + bbs.size());
+		
+		// loop over known people and attch them to bbs
 		for(int i = 0; i < people.size(); i++)	
 		{
 			boolean found = false;
-			int minD = Integer.MAX_VALUE;
+			int minD = (int) this.maxDistance;
 			int minJ = -1;
 			
 			for (int j = 0; j < bbs.size(); j++)
@@ -120,51 +122,106 @@ public class PersonCounter {
 				
 				double d = Math.sqrt(dx*dx + dy*dy);
 				
-				if(d < minD)
+				if(dx < minD)
 				{
 					minD = (int)d;
 					minJ = j;
-				}
-				
-				
-				if (d < this.maxDistance)
-				//if(people.get(i).collidesWith(bbs.get(j)))
-				{
-					people.get(i).oldX = people.get(i).boundingbox.x;
-					people.get(i).oldY = people.get(i).boundingbox.y;					
-					people.get(i).boundingbox = bbs.get(j).clone();
-					bbs.remove(j);
+					
 					found = true;
 				}
+				
+				
+//				if (d < this.maxDistance)
+//				//if(people.get(i).collidesWith(bbs.get(j)))
+//				{
+//					people.get(i).oldX = people.get(i).boundingbox.x;
+//					people.get(i).oldY = people.get(i).boundingbox.y;					
+//					people.get(i).boundingbox = bbs.get(j).clone();
+//					bbs.remove(j);
+//					found = true;
+//					break;
+//				}
 			}
 			if(!found)
 			{
-				
 				lonely.add(people.get(i));
-				
-				
+			}
+			else
+			{
+				people.get(i).oldX = people.get(i).boundingbox.x;
+				people.get(i).oldY = people.get(i).boundingbox.y;				
+				people.get(i).boundingbox = bbs.get(minJ).clone();
+				bbs.remove(minJ);
 			}
 		}
 
+	
+
 		
+		
+		// try to attch lonely people to lonely bss 
 		for (int i = 0; i < lonely.size(); i++)
 		{
 			boolean found = false;
+			
+			int minD = (int) (1* this.maxDistance);
+			int minJ = -1;
+			
 			for(int j = 0; j < bbs.size(); j++)
 			{
-				int dx = lonely.get(i).boundingbox.x - bbs.get(j).x;
+				int dx1 = (int) (lonely.get(i).boundingbox.tl().x - bbs.get(j).br().x);
+				int dx2 = (int) (lonely.get(i).boundingbox.br().x - bbs.get(j).tl().x);
+
 				int dy = lonely.get(i).boundingbox.y - bbs.get(j).y;
+				double d1 = Math.sqrt(dx1*dx1 + dy*dy);
+				double d2 = Math.sqrt(dx2*dx2 + dy*dy);
+
 				
 				
-				lonely.get(j).boundingbox = bbs.get(j).clone();
-				bbs.remove(j);	
-				found = true;
-				break;				
+				if(d1 < minD )
+				{
+					minD = (int)d1;
+					minJ = j;
+					found = true;
+					//break;
+				}
+				if(d2 < minD )
+				{
+					minD = (int)d2;
+					minJ = j;
+					found = true;
+					//break;
+				}
 			}
 			if (found)
+			{
+				lonely.get(i).boundingbox = bbs.get(minJ).clone();
+				bbs.remove(minJ);
 				lonely.remove(i);
-		}	
 
+			}
+		}
+		
+		
+		//remove people
+		for(int j = 0; j < lonely.size(); j++)
+		{
+			System.out.println("remove");
+			
+			int dx1 = lonely.get(j).boundingbox.x;
+			System.out.println(dx1);
+			int dx2 = this.current.width - (lonely.get(j).boundingbox.x + lonely.get(j).boundingbox.width);
+			System.out.println(dx2);
+
+			if((dx1 < 2 || dx2 < 2) && lonely.get(j).boundingbox.width < 100)
+			{
+				people.remove(lonely.get(j));
+				lonely.remove(j);
+				System.out.println("removed");
+
+			}
+		}		
+	// create new people
 		for (int i = 0; i < bbs.size(); i++)
 		{
 			int dx1 = bbs.get(i).x;
@@ -185,27 +242,10 @@ public class PersonCounter {
 			}
 			
 		}
-
-		
-		for(int j = 0; j < lonely.size(); j++)
-		{
-			System.out.println("remove");
-			
-			int dx1 = lonely.get(j).boundingbox.x;
-			System.out.println(dx1);
-			int dx2 = this.current.width - (lonely.get(j).boundingbox.x + lonely.get(j).boundingbox.width);
-			System.out.println(dx2);
-
-			if(dx1 < 2 || dx2 < 2)
-			{
-				people.remove(lonely.get(j));
-				lonely.remove(j);
-				System.out.println("removed");
-
-			}
-		}		
-
 	}
+	
+	
+	
 	public int processImage(Mat img)
 	{
 		this.current.orig = img.clone();
@@ -306,7 +346,10 @@ public class PersonCounter {
 				//if(i == j) continue;
 				
 				Rect r2 = bbs.get(j);
-				if(r1.equals(r2)) continue;
+				if(r1.equals(r2)) 
+				{
+					continue;
+				}
 
 				if (r1.x < r2.x + r2.width &&
 						r1.x + r1.width > r2.x /*&&
@@ -324,7 +367,36 @@ public class PersonCounter {
 //						
 //					}
 					
-				
+					//if(r2.tl().y >= r1.tl().y && r2.br().y <= r1.br().y)
+//					if(r1.y < r2.y + r2.height &&
+//						r1.height + r1.y > r2.y)
+//					{
+//						
+//						System.out.println("continüüü");
+//						continue;
+//					}
+					
+//					if(Math.abs((double)(r2.br().x - r.x)) > 200)
+//					{
+//					
+//						System.out.println("continüüü");
+//						continue;
+//					}			
+					
+					double thresh = .80;
+					double A1 = r1.area();
+					double A2 = r2.area();
+					
+					if(A1 > A2)
+					{
+						if(A2/A1 > thresh)
+							continue;
+					}
+					else
+					{
+						if(A1/A2 > thresh)
+							continue;
+					}
 					
 					if(r2.tl().x < r1.tl().x)
 						r.x = (int)r2.tl().x;

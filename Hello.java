@@ -23,8 +23,14 @@ public class Hello
 		VideoCapture vid = new VideoCapture("/home/stfn/dev/eclipse/labor.mp4");	  
 		if (vid.isOpened())
 			System.out.println("file loaded");		
-		PersonCounter pc = new PersonCounter(40, 500, 90, 3, .001);
+		PersonCounter pc = new PersonCounter(40, 1200, 90, 1, .00001);
 
+		
+//		VideoCapture vid = new VideoCapture(0);
+//		Thread.sleep(1000);
+//		if (vid.isOpened())
+//			System.out.println("file loaded");		
+//		PersonCounter pc = new PersonCounter(40, 1200, 90, 1, .00001);		
 		
 //		VideoCapture vid = new VideoCapture("/home/stfn/dev/eclipse/leute.mp4");
 //		if (vid.isOpened())
