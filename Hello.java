@@ -23,6 +23,7 @@ public class Hello
 {
 	private static Thread videoThread;
 	private static VideoRunnable videoRunnable;
+
 	private static double currThreshold = 40;
 	private static double currMinArea = 700;
 	private static double currMaxDistance = 90;
@@ -30,6 +31,7 @@ public class Hello
 	private static int currAdaptionFactor = 0;
 	
 	private static final String videoPathDefault = "/home/stfn/dev/eclipse/labor.mp4";
+
 	
 	private static JFrame window;
 	
@@ -67,11 +69,11 @@ public class Hello
 		
 		
 		//Change javas standard look and feel to the OS specific look and feel
-		try { 
+		/*try { 
 		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 		    e.printStackTrace();
-		}
+		}*/
 		
 		//initialize log so every component can write debug messages into log
 		Log.initialize();
