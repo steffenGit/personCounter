@@ -23,54 +23,224 @@ import javax.swing.event.ChangeListener;
 
 import org.opencv.core.Core;
 
+/**
+ * About this program:
+ * 
+ * This program was finished on the 24.06.2015 and was written
+ * for the subject of study "Bild- und Videoverarbeitung" at the
+ * University of Applied Sciences Flensburg.
+ * 
+ * What this program does:
+ * 
+ * The program uses a video processing technique to find moving
+ * objects in videos. The provided GUI is built to help finding
+ * the correct thresholds to successfully differentiate between
+ * foreground and background of the video.
+ * 
+ * The GUI:
+ * 
+ * The program uses a BorderLayout. On the top of the screen you
+ * can choose the video you want to run the algorithm on.
+ * On the left you see different sliders for the thresholds used
+ * by the algorithm. Change these values to fit the video.
+ * In the center the videos will be shown after clicking play.
+ * On the right you see a log with debug messages.
+ * On the bottom you can see the frames of the video.
+ * 
+ * Program structure:
+ * 
+ * 		- PersonCounter: The class that holds information about the
+ * 		algorithm and performs the algorithm.
+ * 		- Person: A class representing a person inside the video.
+ * 		- Panel: The GUI-Element that paints the video.
+ * 		- Frame: A class representing a single frame of the video.
+ * 		- LabeldSlider: A class for a slider with a label. (GUI)
+ * 		- VideoRunnable: A class implementing Runnable to show the
+ * 		video in a different thread. After starting, this thread
+ * 		will manage to show the video frame by frame.
+ * 		- Log: A GUI-Element to show debug messages.
+ * 
+ * Dependencies:
+ * 
+ * This program needs the OpenCV 3.0 .jar file to compile. How
+ * to add this to your IDE can be found in the OpenCV documentation.
+ * 
+ * Created by:
+ * Steffen Peleikis
+ * Ole Quedens
+ * Jan Behrens
+ * Marek Michels
+ * 
+ * 
+ * The class that holds the main()-method.
+ * 
+ * This class holds most of the information about the different
+ * GUI elements used in the program.
+ * This class defines all the eventHandlers for the different GUI
+ * elements.
+ * 
+ * @author jan
+ *
+ */
 public class Hello
 {
+	/**
+	 * The thread the video runs in.
+	 */
 	private static Thread videoThread;
+	/**
+	 * The class that implements Runnable and will be started by the videoThread.
+	 */
 	private static VideoRunnable videoRunnable;
-
+	/**
+	 * The default threshold value. This value will be changed by moving the slider
+	 * labeld with "threshold". This value is used by the image processing algorithm.
+	 */
 	private static double currThreshold = 40;
+	/**
+	 * The default value for minArea. This value will be changed by moving the slider
+	 * labeld with "Minimum Area". This value is used by the image processing algorithm.
+	 */
 	private static double currMinArea = 700;
+	/**
+	 * The default value for maxDistance. This value will be changed by moving the slider
+	 * labeld with "Maximum Distance". This value is used by the image processing algorithm.
+	 */
 	private static double currMaxDistance = 90;
+	/**
+	 * The default value for filterSite. This value will be changed by moving the slider
+	 * labeld with "Filter Size". This value is used by the image processing algorithm.
+	 */
 	private static int currFilterSize = 1;
+	/**
+	 * The default value for adaptionFactor. This value will be changed by moving the slider
+	 * labeld with "Adaption Factor". This value is used by the image processing algorithm.
+	 */
 	private static int currAdaptionFactor = 0;
 	
+	/**
+	 * Default path to video you want to run the algorithm with. The video can be changed
+	 * at runtime by using the fileChooser. This path will set to chosen file.
+	 */
 	private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/leute.mp4";
 
-	
+	/**
+	 * The JFrame used to show the program in.
+	 */
 	private static JFrame window;
-	
+	/**
+	 * The top-level container of the program. This container uses the BorderLayout. All
+	 * other containers will be added to this container. The other containers are called
+	 * after their position, i.e. containerTop for the top area of the BorderLayout.
+	 */
 	private static JPanel container;
+	/**
+	 * The container for all elements at the BorderLayout.NORTH position of the top-level
+	 * container.
+	 */
 	private static JPanel containerTop;
+	/**
+	 * The container for all elements at the BorderLayout.LINE_START position of the
+	 * top-level container.
+	 */
 	private static JPanel containerLeft;
+	/**
+	 * The container for all elements at the BorderLayout.SOUTH position of the
+	 * top-level container.
+	 */
 	private static JPanel containerBottom;
+	/**
+	 * The container for all elements at the BorderLayout.LINE_END position of the
+	 * top-level container.
+	 */
 	private static JPanel containerRight;
+	/**
+	 * The container for all elements at the BorderLayout.CENTER position of the
+	 * top-level container.
+	 */
 	private static JScrollPane containerCenter;
 	
+	/**
+	 * The panel that will draw the videos.
+	 */
 	private static Panel panel;
 	
-	
+	/**
+	 * Label for the textBox to choose the video file.
+	 */
 	private static JLabel videoPathLabel;
+	/**
+	 * TextField that shows the currently selected video.
+	 */
 	private static JTextField videoPathTextField;
+	/**
+	 * JFileChooser to select a different video at runtime.
+	 */
 	private static JFileChooser videoPathFileChooser;
+	/**
+	 * The button that starts the dialog of videoPathFileChooser to choose
+	 * a video.
+	 */
 	private static JButton videoPathButton;
 	
+	/**
+	 * A slider to change the value of the class member currThreshold.
+	 */
 	private static LabeldSlider thresholdGui;
+	/**
+	 * A slider to change the value of the class member currMinArea.
+	 */
 	private static LabeldSlider minAreaGui;
+	/**
+	 * A slider to change the value of the class member currMaxDistance.
+	 */
 	private static LabeldSlider maxDistanceGui;
+	/**
+	 * A slider to change the value of the class member currFilterSize.
+	 */
 	private static LabeldSlider filterSizeGui;
+	/**
+	 * A slider to change the value of the class member currAdaptionFactor.
+	 */
 	private static LabeldSlider adaptionFactorGui;
+	/**
+	 * A JTextField that shows the current framerate of the video.
+	 */
 	private static JTextField frameRateTextField;
+	/**
+	 * A button that can be used to play and pause the video.
+	 */
 	private static JButton playButton;
+	/**
+	 * A button to restart the video.
+	 */
 	private static JButton restartButton;
 	
-	
+	/**
+	 * A label for the class member personCounterTextField.
+	 */
 	private static JLabel personCounterLabel;
-	private static JTextField personCounterTextField;;
+	/**
+	 * A JTextField that shows the current count of people in the
+	 * current frame of the video.
+	 */
+	private static JTextField personCounterTextField;
+	/**
+	 * A label for the class member frameRateTextField.
+	 */
 	private static JLabel frameRateLabel;
 	
+	/**
+	 * The main()-method of this program. This method creates the
+	 * GUI of the program and holds all the eventHandlers. The interesting
+	 * part and the algorithm will be triggered by the events of the
+	 * different GUI-Elements.
+	 * 
+	 * @param args Unused
+	 */
 	public static void main( String[] args )
 	{
-		
+		// Load the native library for OpenCV.
 		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 		
 		
@@ -86,6 +256,9 @@ public class Hello
 		
 		videoRunnable = null;
 		
+		/*
+		 * Create the window and set some basic window defaults.
+		 */
 		window = new JFrame("window");
 		window.setSize(800, 500);
 		window.setTitle("OpenCV 3.0 - Background Subtraction");
@@ -97,10 +270,12 @@ public class Hello
 		container = new JPanel();
 		container.setLayout(new BorderLayout());
 		
+		//create the wrapper for elements in the center.
 		containerCenter = new JScrollPane();
 		containerCenter.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
-		panel = new Panel(); // the panel in the center of the screen (shows video)
+		// the panel in the center of the screen (shows video)
+		panel = new Panel(); 
 		panel.setBorder(BorderFactory.createLineBorder(Color.red));
 		panel.setSize(700, 2000);
 		//panel.setPreferredSize(new Dimension(700, 2000));
@@ -228,10 +403,10 @@ public class Hello
 			}
 		});
 		
-		/*
+		/********************************************************************
 		 * Add all the components to the top level containers and then
 		 * add them to the window itself.
-		 */
+		 *******************************************************************/
 		
 		containerTop.add(videoPathLabel);
 		containerTop.add(videoPathTextField);
@@ -268,6 +443,7 @@ public class Hello
 		
 		window.add(container);
 		
+		//maximize window and repaint it
 	    window.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 	    window.setVisible(true);
 	    window.pack();
