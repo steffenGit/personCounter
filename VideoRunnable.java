@@ -126,13 +126,11 @@ public class VideoRunnable implements Runnable{
 				//Mat img = pc.test;
 				
 				panel.addMatrix(img);
-				panel.addMatrix(imgFBW);
+				//panel.addMatrix(imgFBW);
 				panel.addMatrix(diff);
-				panel.addMatrix(grey);
+				//panel.addMatrix(grey);
 				panel.draw();
-				//panel.repaint();
 				
-				//panel.draw(img, imgFBW, diff, grey);
 				fpsCounter++;
 			}
 			

@@ -3,6 +3,7 @@ package personCounter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -43,8 +44,8 @@ public class Hello
 	private static JPanel containerLeft;
 	private static JPanel containerBottom;
 	private static JPanel containerRight;
-	
 	private static JScrollPane containerCenter;
+	
 	private static Panel panel;
 	
 	
@@ -90,20 +91,21 @@ public class Hello
 		window.setTitle("OpenCV 3.0 - Background Subtraction");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
-		panel = new Panel();
-		window.add(panel);
 	   
 		
 		//create a top-level container for the window
 		container = new JPanel();
 		container.setLayout(new BorderLayout());
 		
-		containerCenter = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		//containerCenter.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		containerCenter = new JScrollPane();
+		containerCenter.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		
 		panel = new Panel(); // the panel in the center of the screen (shows video)
 		panel.setBorder(BorderFactory.createLineBorder(Color.red));
 		panel.setSize(700, 2000);
-		panel.setPreferredSize(new Dimension(700, 2000));
+		//panel.setPreferredSize(new Dimension(700, 2000));
+		containerCenter.setPreferredSize(new Dimension(700, 2000));
+		
 		
 		//just some container for the different parts of the borderlayout
 		containerTop = new JPanel();
@@ -265,10 +267,11 @@ public class Hello
 		container.add(containerBottom, BorderLayout.SOUTH);
 		
 		window.add(container);
-	    window.pack();
 		
 	    window.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 	    window.setVisible(true);
+	    window.pack();
+	    window.validate();
 	    window.repaint();
 	    //PersonCounter(40, 500, 90, 3, .001);
 	}

@@ -1,13 +1,16 @@
 package personCounter;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
+import javax.swing.Scrollable;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -73,7 +76,6 @@ public class Panel  extends JPanel{
 	public void paint(Graphics g)
 	{
 		super.paint(g);
-		Log.add("Draw is "+draw);
 		if(draw) {
 			for(int i=0; i<videos.size(); i++) {
 				g.drawImage(videos.get(i), 0, defaultImageHeight*i + i*20, this);
@@ -81,5 +83,11 @@ public class Panel  extends JPanel{
 			videos.clear();
 			draw = false;
 		}
+	}
+	
+	@Override
+	public Dimension getPreferredSize()
+	{
+		return new Dimension(700, 2000);
 	}
 }
