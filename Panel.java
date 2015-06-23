@@ -1,24 +1,30 @@
-//package personCounter;
+package personCounter;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.RepaintManager;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 
 public class Panel  extends JPanel{
-	BufferedImage coloredImage;
-	BufferedImage backgroundImage;
-	BufferedImage foregroundImage;
-	BufferedImage differenceImage;
+	boolean draw = false;
+	ArrayList<BufferedImage> videos = new ArrayList<BufferedImage>();
+	int defaultImageWidth = 640;
+	int defaultImageHeight = 320;
 	
-	int defaultImageWidth = 320;
-	int defaultImageHeight = 180;
+	public Panel()
+	{
+		super();
+		//prevent automatic repaint
+		RepaintManager.currentManager(this).markCompletelyClean(this);
+	}
 	
 	public BufferedImage matrixToBufferedImage(Mat m, BufferedImage image)
 	{
@@ -29,14 +35,10 @@ public class Panel  extends JPanel{
 			type = BufferedImage.TYPE_3BYTE_BGR;
 			m = m2;
 		}
-		
 		byte [] b = new byte[m.channels()*m.cols()*m.rows()];
 		m.get(0,0,b); // get all the pixels
 		image = new BufferedImage(m.cols(),m.rows(), type);
 		image.getRaster().setDataElements(0, 0, m.cols(),m.rows(), b);
-		
-		//image = (BufferedImage)image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-		
 		return image;
 	}
 	
@@ -51,28 +53,33 @@ public class Panel  extends JPanel{
 	    return rescaledImage;
 	}
 	
-	public void draw(Mat coloredMatrix, Mat foregroundMatrix, Mat differenceMatrix, Mat backgroundMatrix)
+	public void addMatrix(Mat videoMatrix)
 	{
-		coloredImage = matrixToBufferedImage(coloredMatrix, coloredImage);
-		coloredImage = rescaleImage(coloredImage, defaultImageWidth, defaultImageHeight);
-		foregroundImage = matrixToBufferedImage(foregroundMatrix, foregroundImage);
-		foregroundImage = rescaleImage(foregroundImage, defaultImageWidth, defaultImageHeight);
-		differenceImage = matrixToBufferedImage(differenceMatrix, differenceImage);
-		differenceImage = rescaleImage(differenceImage, defaultImageWidth, defaultImageHeight);
-		backgroundImage = matrixToBufferedImage(backgroundMatrix, backgroundImage);
-		backgroundImage = rescaleImage(backgroundImage, defaultImageWidth, defaultImageHeight);
-		getParent().repaint();
+		BufferedImage img = new BufferedImage(videoMatrix.cols(), videoMatrix.rows(), BufferedImage.TYPE_3BYTE_BGR);
+		img = matrixToBufferedImage(videoMatrix, img);
+		img = rescaleImage(img, defaultImageWidth, defaultImageHeight);
+		videos.add(img);
+	}
+	
+	public void draw()
+	{
+		//this.getParent().getParent().repaint();
+		draw = true;
+		//this.getParent().getParent().repaint();
+		this.repaint();
 	}
 	
 	@Override
 	public void paint(Graphics g)
 	{
 		super.paint(g);
-		g.drawImage(coloredImage, 0,0, this);
-		g.drawImage(backgroundImage, defaultImageWidth+20, 0, this);
-		g.drawImage(foregroundImage, 0, defaultImageHeight+20, this);
-		g.drawImage(differenceImage, defaultImageWidth+20, defaultImageHeight+20, this);
+		Log.add("Draw is "+draw);
+		if(draw) {
+			for(int i=0; i<videos.size(); i++) {
+				g.drawImage(videos.get(i), 0, defaultImageHeight*i + i*20, this);
+			}
+			videos.clear();
+			draw = false;
+		}
 	}
-	
-
 }

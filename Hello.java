@@ -1,19 +1,22 @@
-//package personCounter;
+package personCounter;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -30,7 +33,7 @@ public class Hello
 	private static int currFilterSize = 1;
 	private static int currAdaptionFactor = 0;
 	
-	private static final String videoPathDefault = "/home/stfn/dev/eclipse/labor.mp4";
+	private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/leute.mp4";
 
 	
 	private static JFrame window;
@@ -40,6 +43,8 @@ public class Hello
 	private static JPanel containerLeft;
 	private static JPanel containerBottom;
 	private static JPanel containerRight;
+	
+	private static JScrollPane containerCenter;
 	private static Panel panel;
 	
 	
@@ -92,8 +97,13 @@ public class Hello
 		//create a top-level container for the window
 		container = new JPanel();
 		container.setLayout(new BorderLayout());
-		panel = new Panel(); // the panel in the center of the screen (shows video)
 		
+		containerCenter = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		//containerCenter.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		panel = new Panel(); // the panel in the center of the screen (shows video)
+		panel.setBorder(BorderFactory.createLineBorder(Color.red));
+		panel.setSize(700, 2000);
+		panel.setPreferredSize(new Dimension(700, 2000));
 		
 		//just some container for the different parts of the borderlayout
 		containerTop = new JPanel();
@@ -246,14 +256,17 @@ public class Hello
 		
 		containerRight.add(Log.getComponent());
 		
+		containerCenter.add(panel);
+		
 		container.add(containerTop, BorderLayout.NORTH);
 		container.add(containerLeft, BorderLayout.LINE_START);
 		container.add(containerRight, BorderLayout.LINE_END);
-		container.add(panel, BorderLayout.CENTER);
+		container.add(containerCenter, BorderLayout.CENTER);
 		container.add(containerBottom, BorderLayout.SOUTH);
 		
 		window.add(container);
-	    
+	    window.pack();
+		
 	    window.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 	    window.setVisible(true);
 	    window.repaint();
