@@ -116,7 +116,7 @@ public class PersonCounter {
 //			Imgproc.rectangle(this.current.resultColor, bbs.get(i).tl(), bbs.get(i).br(), new Scalar(0, 255,0),1);
 //		}
 		
-		List<Rect> bbsIntersected = intersectBoundingBoxes(bbs);
+		List<Rect> bbsIntersected = mergeBoundingBoxes(bbs);
 		for(int i = 0; i < bbsIntersected.size(); i++)
 		{
 			Imgproc.rectangle(this.current.resultColor, bbsIntersected.get(i).tl(), bbsIntersected.get(i).br(), new Scalar(255, 0,0),1);
@@ -146,7 +146,7 @@ public class PersonCounter {
 		List<Person> lonely = new ArrayList<Person>();
 		//System.out.println("before bbs " + bbs.size());
 		
-		// loop over known people and attch them to bbs
+		// loop over known people and attach them to bbs
 		for(int i = 0; i < people.size(); i++)	
 		{
 			boolean found = false;
@@ -207,7 +207,7 @@ public class PersonCounter {
 
 		
 		
-		// try to attch lonely people to lonely bss 
+		// try to attach lonely people to lonely bss 
 		for (int i = 0; i < lonely.size(); i++)
 		{
 			boolean found = false;
@@ -242,6 +242,7 @@ public class PersonCounter {
 //				}
 				if(d < minD )
 				{
+					System.out.println("         ATTCJED lonely");
 					minD = (int)d2;
 					minJ = j;
 					found = true;
@@ -385,7 +386,7 @@ public class PersonCounter {
 		
 	}
 	
-	List<Rect> intersectBoundingBoxes(List<Rect> bbs)
+	List<Rect> mergeBoundingBoxes(List<Rect> bbs)
 	{
 		List<Rect> bbs2 = new ArrayList<Rect>();
 		for(int i = 0; i < bbs.size(); i++)
