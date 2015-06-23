@@ -150,17 +150,36 @@ public class PersonCounter {
 		for(int i = 0; i < people.size(); i++)	
 		{
 			boolean found = false;
-			int minD = (int) this.maxDistance;
+			int minD = (int) (2*this.maxDistance);
 			int minJ = -1;
 			
 			for (int j = 0; j < bbs.size(); j++)
 			{
-				int dx = Math.abs(bbs.get(j).x - people.get(i).boundingbox.x);
+				int dx1 = (int) Math.abs(bbs.get(j).tl().x - people.get(i).boundingbox.tl().x);
+				int dx2 = (int) Math.abs(bbs.get(j).br().x - people.get(i).boundingbox.br().x);
+
 				int dy = Math.abs(bbs.get(j).y - people.get(i).boundingbox.y);
 				
-				double d = Math.sqrt(dx*dx + dy*dy);
+				double d1 = Math.sqrt(dx1*dx1 + dy*dy);
+				double d2 = Math.sqrt(dx2*dx2 + dy*dy);
+
+				double d = d1+d2;		
 				
-				if(dx < minD)
+//				if(d1 < minD )
+//				{
+//					minD = (int)d1;
+//					minJ = j;
+//					found = true;
+//					//break;
+//				}
+//				if(d2 < minD )
+//				{
+//					minD = (int)d2;
+//					minJ = j;
+//					found = true;
+//					//break;
+//				}
+				if(d < minD)
 				{
 					minD = (int)d;
 					minJ = j;
@@ -169,16 +188,7 @@ public class PersonCounter {
 				}
 				
 				
-//				if (d < this.maxDistance)
-//				//if(people.get(i).collidesWith(bbs.get(j)))
-//				{
-//					people.get(i).oldX = people.get(i).boundingbox.x;
-//					people.get(i).oldY = people.get(i).boundingbox.y;					
-//					people.get(i).boundingbox = bbs.get(j).clone();
-//					bbs.remove(j);
-//					found = true;
-//					break;
-//				}
+
 			}
 			if(!found)
 			{
@@ -202,28 +212,35 @@ public class PersonCounter {
 		{
 			boolean found = false;
 			
-			int minD = (int) (1* this.maxDistance);
+			int minD = (int) (3* this.maxDistance);
 			int minJ = -1;
 			
 			for(int j = 0; j < bbs.size(); j++)
 			{
-				int dx1 = (int) (lonely.get(i).boundingbox.tl().x - bbs.get(j).br().x);
-				int dx2 = (int) (lonely.get(i).boundingbox.br().x - bbs.get(j).tl().x);
+				int dx1 = (int) Math.abs((lonely.get(i).boundingbox.tl().x - bbs.get(j).tl().x));
+				int dx2 = (int) Math.abs((lonely.get(i).boundingbox.br().x - bbs.get(j).br().x));
 
 				int dy = lonely.get(i).boundingbox.y - bbs.get(j).y;
 				double d1 = Math.sqrt(dx1*dx1 + dy*dy);
 				double d2 = Math.sqrt(dx2*dx2 + dy*dy);
 
+				double d = d1+d2;
 				
-				
-				if(d1 < minD )
-				{
-					minD = (int)d1;
-					minJ = j;
-					found = true;
-					//break;
-				}
-				if(d2 < minD )
+//				if(d1 < minD )
+//				{
+//					minD = (int)d1;
+//					minJ = j;
+//					found = true;
+//					//break;
+//				}
+//				if(d2 < minD )
+//				{
+//					minD = (int)d2;
+//					minJ = j;
+//					found = true;
+//					//break;
+//				}
+				if(d < minD )
 				{
 					minD = (int)d2;
 					minJ = j;
