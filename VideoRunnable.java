@@ -79,7 +79,7 @@ public class VideoRunnable implements Runnable{
 	 * @param filterSize The filterSize for the algorithm. - Not used in this class
 	 * @param adaptionFactor The adaptionFactor for the algorithm. - Not used in this class
 	 */
-	public VideoRunnable(Panel panel, String videoPath, JTextField frameRateTextField, double threshold, double minArea, double maxDistance, int filterSize, int adaptionFactor)
+	public VideoRunnable(Panel panel, String videoPath, JTextField frameRateTextField, double threshold, double minArea, double maxDistance, int filterSize, int adaptionFactor, int minBBsize)
 	{
 		this.frameRateTextField = frameRateTextField;
 		this.panel = panel;
@@ -94,7 +94,7 @@ public class VideoRunnable implements Runnable{
 //		}
 		if (vid.isOpened())
 		System.out.println("file loaded");
-		pc = new PersonCounter(threshold, minArea, maxDistance, filterSize, adaptionFactor);
+		pc = new PersonCounter(threshold, minArea, maxDistance, filterSize, adaptionFactor, minBBsize);
 	}
 	
 	/**
@@ -200,6 +200,11 @@ public class VideoRunnable implements Runnable{
 	
 	public void setAdaptionFactor(int adaptionFactor) {
 		this.pc.adaptionFactor = adaptionFactor;
+	}
+	
+	public void setMinBBsize(int minBBsize)
+	{
+		this.pc.minBBsize = minBBsize;
 	}
 	
 }
