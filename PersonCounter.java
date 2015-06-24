@@ -23,6 +23,7 @@ public class PersonCounter {
 	Frame last;
 	boolean printed = false;
 	int id = 0;
+	int cnt = 0;
 	
 	public PersonCounter(double threshold, 
 			double minArea, 
@@ -38,7 +39,6 @@ public class PersonCounter {
 		this.adaptionFactor = adaptionFactor;
 		this.minBBsize = minBBsize;
 		
-		
 		this.current = new Frame();
 		this.last = null;
 		
@@ -49,7 +49,6 @@ public class PersonCounter {
 		this.current.resultColor = null;
 		
 		people = new ArrayList<Person>();
-	
 	}
 	
 	public Mat getGrey(){
@@ -104,9 +103,10 @@ public class PersonCounter {
 		}
 		
 		attachBBStoPeopleList(bbsIntersected, lonely);
-		
-		System.out.println(" lonely " + Integer.toString(lonely.size()) + " bbs left " + Integer.toString(bbsIntersected.size()));
-		
+		attachLonelyToLonely(bbsIntersected, lonely);
+		removePeople(lonely);
+		createNewPeople(bbsIntersected);
+				
 		Imgproc.putText(this.current.resultColor, "Total: " + Integer.toString(this.people.size()) + 
 				" lonely " + Integer.toString(lonely.size()) + 
 				" bbs left " + Integer.toString(bbsIntersected.size()), 
@@ -128,7 +128,6 @@ public class PersonCounter {
 					new Scalar(0, 0,255),2);
 		}
 		
-		//System.out.println(this.people.size());
 
 		this.last = this.current.clone();
 		return 0;
@@ -137,8 +136,6 @@ public class PersonCounter {
 	
 	void attachBBStoPeopleList(List<Rect> bbs, List<Person> lonely) {
 		
-		
-		//System.out.println("before bbs " + bbs.size());
 		
 		// loop over known people and attach them to bbs
 		for(int i = 0; i < people.size(); i++)	
@@ -159,20 +156,7 @@ public class PersonCounter {
 
 				double d = d1+d2;		
 				
-//				if(d1 < minD )
-//				{
-//					minD = (int)d1;
-//					minJ = j;
-//					found = true;
-//					//break;
-//				}
-//				if(d2 < minD )
-//				{
-//					minD = (int)d2;
-//					minJ = j;
-//					found = true;
-//					//break;
-//				}
+
 				if(d < minD)
 				{
 					minD = (int)d;
@@ -180,33 +164,22 @@ public class PersonCounter {
 					
 					found = true;
 				}
-				
-				
-
 			}
-			if(!found)
-			{
-				lonely.add(people.get(i));
-			}
-			else
+			if(found)
 			{
 				people.get(i).oldX = people.get(i).boundingbox.x;
 				people.get(i).oldY = people.get(i).boundingbox.y;				
 				people.get(i).boundingbox = bbs.get(minJ).clone();
 				bbs.remove(minJ);
 			}
+			else
+			{
+				lonely.add(people.get(i));
+			}
 		}
-
 	}
 
-		
-		
-		
-		
-		
-		
 
-	
 	public void attachLonelyToLonely(List<Rect> bbs, List<Person> lonely)
 	{
 		// try to attach lonely people to lonely bss 
@@ -234,7 +207,6 @@ public class PersonCounter {
 					minD = (int)d2;
 					minJ = j;
 					found = true;
-					//break;
 				}
 			}
 			if (found)
@@ -243,8 +215,6 @@ public class PersonCounter {
 				bbs.remove(minJ);
 				lonely.remove(i);
 			    Log.add("created");
-
-
 			}
 		}
 	}
@@ -292,10 +262,8 @@ public class PersonCounter {
 				p.boundingbox = bbs.get(i).clone();
 				people.add(p);
 				bbs.remove(i);
-			}
-			
+			}	
 		}
-		
 	}	
 
 	
@@ -326,24 +294,27 @@ public class PersonCounter {
 		// blur the image
 		Imgproc.GaussianBlur(this.current.grey, this.current.grey, new Size(this.filterSize, this.filterSize), 0);		
 		
-		// adapt background		
-		for(int r = 0; r < this.current.grey.rows(); r++)
+		if(cnt++ % 10 == 0)
 		{
-			for(int c = 0; c < this.current.grey.cols(); c++)
+			// adapt background		
+			for(int r = 0; r < this.current.grey.rows(); r++)
 			{
-				if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
-					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/100);
-				else
-					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/100);
-			}
+				for(int c = 0; c < this.current.grey.cols(); c++)
+				{
+					if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
+						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/100);
+					else
+						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/100);
+				}
+			}	
 		}
+		
+		
 		//get difference			
 		Core.absdiff(this.current.grey, this.current.backgroundGrey, this.current.differenceGrey);
 		
 		//get thresholded-image
 		Imgproc.threshold(this.current.differenceGrey, this.current.foregroundBW, this.threshold, 255, Imgproc.THRESH_BINARY);
-
-
 	}
 	
 	
@@ -373,7 +344,6 @@ public class PersonCounter {
 			}
 		}
 		return bbs;
-		
 	}
 	
 	List<Rect> mergeBoundingBoxes(List<Rect> bbs)
