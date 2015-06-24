@@ -1,4 +1,4 @@
-package personCounter;
+//package personCounter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,10 +111,10 @@ public class PersonCounter {
 		// get their boundinboxes, with threshold
 		List<Rect> bbs = findBoundingBoxes(contours, 2200);
 				
-//		for(int i = 0; i < bbs.size(); i++)
-//		{
-//			Imgproc.rectangle(this.current.resultColor, bbs.get(i).tl(), bbs.get(i).br(), new Scalar(0, 255,0),1);
-//		}
+		for(int i = 0; i < bbs.size(); i++)
+		{
+			Imgproc.rectangle(this.current.foregroundBW, bbs.get(i).tl(), bbs.get(i).br(), new Scalar(255, 255,255),2);
+		}
 		
 		List<Rect> bbsIntersected = mergeBoundingBoxes(bbs);
 		for(int i = 0; i < bbsIntersected.size(); i++)
@@ -126,11 +126,11 @@ public class PersonCounter {
 		
 		System.out.println(" lonely " + Integer.toString(single.size()) + " bbs left " + Integer.toString(bbsIntersected.size()));
 		
-		Imgproc.putText(this.current.resultColor, "Total: " + Integer.toString(this.people.size()) + " lonely " + Integer.toString(single.size()) + " bbs left " + Integer.toString(bbsIntersected.size()), new Point(15,25), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),1,1, false);
+		Imgproc.putText(this.current.resultColor, "Total: " + Integer.toString(this.people.size()) + " lonely " + Integer.toString(single.size()) + " bbs left " + Integer.toString(bbsIntersected.size()), new Point(15,25), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),3,1, false);
 		
 		for(int i = 0; i < this.people.size(); i++)
 		{
-			Imgproc.putText(this.current.resultColor, Integer.toString(people.get(i).id), new Point(people.get(i).boundingbox.tl().x, this.current.height - 20), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),1,1, false);
+			Imgproc.putText(this.current.resultColor, Integer.toString(people.get(i).id), new Point(people.get(i).boundingbox.tl().x, this.current.height - 20), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),2,1, false);
 			Imgproc.rectangle(this.current.resultColor, people.get(i).boundingbox.tl(), people.get(i).boundingbox.br(), new Scalar(0, 0,255),2);
 		}
 		

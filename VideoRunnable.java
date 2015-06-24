@@ -1,4 +1,4 @@
-package personCounter;
+//package personCounter;
 
 import java.awt.Dimension;
 
@@ -127,7 +127,7 @@ public class VideoRunnable implements Runnable{
 				
 				panel.addMatrix(img);
 				//panel.addMatrix(imgFBW);
-				panel.addMatrix(diff);
+				panel.addMatrix(imgFBW);
 				//panel.addMatrix(grey);
 				panel.draw();
 				

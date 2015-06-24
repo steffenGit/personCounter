@@ -1,4 +1,4 @@
-package personCounter;
+//package personCounter;
 
 import java.awt.Font;
 

@@ -1,4 +1,4 @@
-package personCounter;
+//package personCounter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -122,7 +122,8 @@ public class Hello
 	 * Default path to video you want to run the algorithm with. The video can be changed
 	 * at runtime by using the fileChooser. This path will set to chosen file.
 	 */
-	private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/leute.mp4";
+	//private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/leute.mp4";
+	private static final String videoPathDefault = "/home/stfn/dev/eclipse/labor.mp4";
 
 	/**
 	 * The JFrame used to show the program in.
@@ -320,7 +321,7 @@ public class Hello
 		 * Add event listener to the different components
 		 *******************************************************************/
 		
-		thresholdGui = new LabeldSlider("Set Threshold", 0, 50, 15, 1, 5);
+		thresholdGui = new LabeldSlider("Set Threshold", 0, 150, (int)currThreshold, 5, 30);
 		thresholdGui.getSlider().addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -328,7 +329,7 @@ public class Hello
 				Log.add("Setting threshold to: "+currThreshold);
 			}
 		});
-		minAreaGui = new LabeldSlider("Set Minimum Area", 0, 500, 100, 10, 100);
+		minAreaGui = new LabeldSlider("Set Minimum Area", 0, 1500, (int)currMinArea, 50, 300);
 		minAreaGui.getSlider().addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -336,7 +337,7 @@ public class Hello
 				Log.add("Setting minArea to: "+currMinArea);
 			}
 		});
-		maxDistanceGui = new LabeldSlider("Set Maximum Distance", 0, 200, 50, 10, 25);
+		maxDistanceGui = new LabeldSlider("Set Maximum Distance", 0, 200, (int)currMaxDistance, 10, 25);
 		maxDistanceGui.getSlider().addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -344,7 +345,7 @@ public class Hello
 				Log.add("Setting maxDistance to: "+currMaxDistance);
 			}
 		});
-		filterSizeGui = new LabeldSlider("Set Filter Size", 0, 50, 3, 1, 5);
+		filterSizeGui = new LabeldSlider("Set Filter Size", 0, 20, currFilterSize, 1, 5);
 		filterSizeGui.getSlider().addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -352,7 +353,7 @@ public class Hello
 				Log.add("Setting filterSize to: "+currFilterSize);
 			}
 		});
-		adaptionFactorGui = new LabeldSlider("Set Adaption Factor", 0, 50, 4, 1, 5);
+		adaptionFactorGui = new LabeldSlider("Set Adaption Factor", 0, 50, currAdaptionFactor, 1, 5);
 		adaptionFactorGui.getSlider().addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
