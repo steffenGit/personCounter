@@ -326,6 +326,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currThreshold = thresholdGui.getSlider().getValue();
+				videoRunnable.setThreshold(currThreshold);
 				Log.add("Setting threshold to: "+currThreshold);
 			}
 		});
@@ -334,6 +335,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currMinArea = minAreaGui.getSlider().getValue();
+				videoRunnable.setMinArea(currMinArea);
 				Log.add("Setting minArea to: "+currMinArea);
 			}
 		});
@@ -342,6 +344,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currMaxDistance = maxDistanceGui.getSlider().getValue();
+				videoRunnable.setMaxDistance(currMaxDistance);
 				Log.add("Setting maxDistance to: "+currMaxDistance);
 			}
 		});
@@ -350,6 +353,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currFilterSize = filterSizeGui.getSlider().getValue();
+				videoRunnable.setFilterSize(currFilterSize);
 				Log.add("Setting filterSize to: "+currFilterSize);
 			}
 		});
@@ -358,6 +362,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currAdaptionFactor = adaptionFactorGui.getSlider().getValue();
+				videoRunnable.setAdaptionFactor(currAdaptionFactor);
 				Log.add("Setting adaptionFactor to: "+currAdaptionFactor);
 			}
 		});

@@ -181,4 +181,25 @@ public class VideoRunnable implements Runnable{
 		return this.pc;
 	}
 	
+	
+	public void setThreshold(double threshold) {
+		this.pc.threshold = threshold;
+	}
+	
+	public void setMinArea(double minArea) {
+		this.pc.minArea = minArea;
+	}
+	
+	public void setMaxDistance(double maxDistance) {
+		this.pc.maxDistance = maxDistance;
+	}
+	
+	public void setFilterSize(int filterSize) {
+		this.pc.filterSize = filterSize;
+	}
+	
+	public void setAdaptionFactor(int adaptionFactor) {
+		this.pc.adaptionFactor = adaptionFactor;
+	}
+	
 }
