@@ -118,6 +118,9 @@ public class Hello
 	 */
 	private static int currAdaptionFactor = 0;
 	
+	
+	private static int currMinBBsize = 2200;
+
 	/**
 	 * Default path to video you want to run the algorithm with. The video can be changed
 	 * at runtime by using the fileChooser. This path will set to chosen file.
@@ -204,6 +207,9 @@ public class Hello
 	 * A slider to change the value of the class member currAdaptionFactor.
 	 */
 	private static LabeldSlider adaptionFactorGui;
+	
+	private static LabeldSlider minBBsizeGui;
+
 	/**
 	 * A JTextField that shows the current framerate of the video.
 	 */
@@ -326,6 +332,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currThreshold = thresholdGui.getSlider().getValue();
+				videoRunnable.setThreshold(currThreshold);
 				Log.add("Setting threshold to: "+currThreshold);
 			}
 		});
@@ -334,6 +341,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currMinArea = minAreaGui.getSlider().getValue();
+				videoRunnable.setMinArea(currMinArea);
 				Log.add("Setting minArea to: "+currMinArea);
 			}
 		});
@@ -342,6 +350,7 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currMaxDistance = maxDistanceGui.getSlider().getValue();
+				videoRunnable.setMaxDistance(currMaxDistance);
 				Log.add("Setting maxDistance to: "+currMaxDistance);
 			}
 		});
@@ -349,8 +358,13 @@ public class Hello
 		filterSizeGui.getSlider().addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				currFilterSize = filterSizeGui.getSlider().getValue();
-				Log.add("Setting filterSize to: "+currFilterSize);
+				if(filterSizeGui.getSlider().getValue() % 2 == 1)
+				{
+					currFilterSize = filterSizeGui.getSlider().getValue();
+					videoRunnable.setFilterSize(currFilterSize);
+					Log.add("Setting filterSize to: "+currFilterSize);	
+				}
+				
 			}
 		});
 		adaptionFactorGui = new LabeldSlider("Set Adaption Factor", 0, 50, currAdaptionFactor, 1, 5);
@@ -358,7 +372,18 @@ public class Hello
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				currAdaptionFactor = adaptionFactorGui.getSlider().getValue();
+				videoRunnable.setAdaptionFactor(currAdaptionFactor);
 				Log.add("Setting adaptionFactor to: "+currAdaptionFactor);
+			}
+		});
+		
+		minBBsizeGui = new LabeldSlider("Set min BB size", 0, 5000, currMinBBsize, 50, 1000);
+		minBBsizeGui.getSlider().addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				currMinBBsize = minBBsizeGui.getSlider().getValue();
+				videoRunnable.setMinBBsize(currMinBBsize);
+				Log.add("Setting currMinBBsize to: "+currMinBBsize);
 			}
 		});
 		playButton = new JButton("Play");
@@ -368,7 +393,7 @@ public class Hello
 				if(videoRunnable == null) {
 					Log.addSeperator();
 					Log.add("Starting Video \""+videoPathTextField.getText()+"\"");
-					videoRunnable = new VideoRunnable(panel, videoPathTextField.getText(), frameRateTextField, currThreshold, currMinArea, currMaxDistance, currFilterSize, currAdaptionFactor);
+					videoRunnable = new VideoRunnable(panel, videoPathTextField.getText(), frameRateTextField, currThreshold, currMinArea, currMaxDistance, currFilterSize, currAdaptionFactor, currMinBBsize);
 					videoThread = new Thread(videoRunnable);
 					videoThread.start();
 					playButton.setText("Pause");
@@ -394,7 +419,7 @@ public class Hello
 					Log.add("Starting Video \""+videoPathTextField.getText()+"\"");
 					videoRunnable.stopRunning();
 					videoThread.join();
-					videoRunnable = new VideoRunnable(panel, videoPathTextField.getText(), frameRateTextField, currThreshold, currMinArea, currMaxDistance, currFilterSize, currAdaptionFactor);
+					videoRunnable = new VideoRunnable(panel, videoPathTextField.getText(), frameRateTextField, currThreshold, currMinArea, currMaxDistance, currFilterSize, currAdaptionFactor, currMinBBsize);
 					videoThread = new Thread(videoRunnable);
 					videoThread.start();
 					playButton.setText("Pause");
@@ -429,6 +454,8 @@ public class Hello
 		containerLeft.add(filterSizeGui.getSlider());
 		containerLeft.add(adaptionFactorGui.getLabel());
 		containerLeft.add(adaptionFactorGui.getSlider());
+		containerLeft.add(minBBsizeGui.getLabel());
+		containerLeft.add(minBBsizeGui.getSlider());
 		containerLeft.add(playButton);
 		containerLeft.add(restartButton);
 		

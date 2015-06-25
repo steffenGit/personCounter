@@ -13,36 +13,31 @@ import org.opencv.imgproc.*;
 
 public class PersonCounter {
 	List<Person> people;
-	double threshold;
-	double minArea;
-	double maxDistance;
-	int filterSize;
-	double adaptionFactor;
+	public double threshold;
+	public double minArea;
+	public double maxDistance;
+	public int filterSize;
+	public double adaptionFactor;
+	public int minBBsize;
 	Frame current;
 	Frame last;
 	boolean printed = false;
 	int id = 0;
+	int cnt = 0;
 	
 	public PersonCounter(double threshold, 
 			double minArea, 
 			double maxDistance, 
 			int filterSize, 
-			double adaptionFactor)
-	{
-		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
-	}
-	
-	private void initialize(double threshold, 
-			double minArea, 
-			double maxDistance, 
-			int filterSize, 
-			double adaptionFactor)
+			double adaptionFactor,
+			int minBBsize)
 	{
 		this.threshold = threshold;
 		this.minArea = minArea;
 		this.maxDistance = maxDistance;
 		this.filterSize = filterSize;
 		this.adaptionFactor = adaptionFactor;
+		this.minBBsize = minBBsize;
 		
 		this.current = new Frame();
 		this.last = null;
@@ -54,31 +49,6 @@ public class PersonCounter {
 		this.current.resultColor = null;
 		
 		people = new ArrayList<Person>();
-	}
-	
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
-	}
-	
-	public void setMinArea(double minArea) {
-		this.minArea = minArea;
-		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
-	}
-	
-	public void setMaxDistance(double maxDistance) {
-		this.maxDistance = maxDistance;
-		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
-	}
-	
-	public void setFilterSize(int filterSize) {
-		this.filterSize = filterSize;
-		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
-	}
-	
-	public void setAdaptionFactor(int adaptionFactor) {
-		this.adaptionFactor = adaptionFactor;
-		this.initialize(threshold, minArea, maxDistance, filterSize, adaptionFactor);
 	}
 	
 	public Mat getGrey(){
@@ -104,47 +74,68 @@ public class PersonCounter {
 		// process the image, getting our ROIs
 		this.processImage(img);
 
+		List<MatOfPoint> contours;
+		List<Rect> bbs;
+		List<Rect> bbsIntersected;
+		List<Person> lonely = new ArrayList<Person>();
 		// get the contours of all shapes, with threshold
-		List<MatOfPoint> contours = findContours(this.current, this.minArea);
+		contours = findContours(this.current, this.minArea);
 		Imgproc.drawContours(this.current.resultColor, contours, -1, new Scalar(255,128,128), 1);
 		
 		// get their boundinboxes, with threshold
-		List<Rect> bbs = findBoundingBoxes(contours, 2200);
+		bbs = findBoundingBoxes(contours, this.minBBsize);
 				
 		for(int i = 0; i < bbs.size(); i++)
 		{
-			Imgproc.rectangle(this.current.foregroundBW, bbs.get(i).tl(), bbs.get(i).br(), new Scalar(255, 255,255),2);
+			Imgproc.rectangle(this.current.foregroundBW, 
+					bbs.get(i).tl(), 
+					bbs.get(i).br(), 
+					new Scalar(255, 255,255),2);
 		}
 		
-		List<Rect> bbsIntersected = mergeBoundingBoxes(bbs);
+		bbsIntersected = mergeBoundingBoxes(bbs);
 		for(int i = 0; i < bbsIntersected.size(); i++)
 		{
-			Imgproc.rectangle(this.current.resultColor, bbsIntersected.get(i).tl(), bbsIntersected.get(i).br(), new Scalar(255, 0,0),1);
+			Imgproc.rectangle(this.current.resultColor, 
+					bbsIntersected.get(i).tl(), 
+					bbsIntersected.get(i).br(), 
+					new Scalar(255, 0,0),1);
 		}
 		
-		List<Person> single = attachBBStoPeopleList(bbsIntersected, this.people);
-		
-		System.out.println(" lonely " + Integer.toString(single.size()) + " bbs left " + Integer.toString(bbsIntersected.size()));
-		
-		Imgproc.putText(this.current.resultColor, "Total: " + Integer.toString(this.people.size()) + " lonely " + Integer.toString(single.size()) + " bbs left " + Integer.toString(bbsIntersected.size()), new Point(15,25), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),3,1, false);
+		attachBBStoPeopleList(bbsIntersected, lonely);
+		attachLonelyToLonely(bbsIntersected, lonely);
+		removePeople(lonely);
+		createNewPeople(bbsIntersected);
+				
+		Imgproc.putText(this.current.resultColor, "Total: " + Integer.toString(this.people.size()) + 
+				" lonely " + Integer.toString(lonely.size()) + 
+				" bbs left " + Integer.toString(bbsIntersected.size()), 
+				new Point(15,25),
+				Core.FONT_HERSHEY_SIMPLEX, 1, 
+				new Scalar(255,255,255),3,1, false);
 		
 		for(int i = 0; i < this.people.size(); i++)
 		{
-			Imgproc.putText(this.current.resultColor, Integer.toString(people.get(i).id), new Point(people.get(i).boundingbox.tl().x, this.current.height - 20), Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,255,255),2,1, false);
-			Imgproc.rectangle(this.current.resultColor, people.get(i).boundingbox.tl(), people.get(i).boundingbox.br(), new Scalar(0, 0,255),2);
+			Imgproc.putText(this.current.resultColor, 
+					Integer.toString(people.get(i).id), 
+					new Point(people.get(i).boundingbox.tl().x, 
+							this.current.height - 20), 
+					Core.FONT_HERSHEY_SIMPLEX, 1, 
+					new Scalar(255,255,255),2,1, false);
+			Imgproc.rectangle(this.current.resultColor, 
+					people.get(i).boundingbox.tl(), 
+					people.get(i).boundingbox.br(), 
+					new Scalar(0, 0,255),2);
 		}
 		
-		//System.out.println(this.people.size());
 
 		this.last = this.current.clone();
 		return 0;
 	}
 	
 	
-	private List<Person> attachBBStoPeopleList(List<Rect> bbs, List<Person> people) {
+	void attachBBStoPeopleList(List<Rect> bbs, List<Person> lonely) {
 		
-		List<Person> lonely = new ArrayList<Person>();
-		//System.out.println("before bbs " + bbs.size());
 		
 		// loop over known people and attach them to bbs
 		for(int i = 0; i < people.size(); i++)	
@@ -165,20 +156,7 @@ public class PersonCounter {
 
 				double d = d1+d2;		
 				
-//				if(d1 < minD )
-//				{
-//					minD = (int)d1;
-//					minJ = j;
-//					found = true;
-//					//break;
-//				}
-//				if(d2 < minD )
-//				{
-//					minD = (int)d2;
-//					minJ = j;
-//					found = true;
-//					//break;
-//				}
+
 				if(d < minD)
 				{
 					minD = (int)d;
@@ -186,27 +164,24 @@ public class PersonCounter {
 					
 					found = true;
 				}
-				
-				
-
 			}
-			if(!found)
-			{
-				lonely.add(people.get(i));
-			}
-			else
+			if(found)
 			{
 				people.get(i).oldX = people.get(i).boundingbox.x;
 				people.get(i).oldY = people.get(i).boundingbox.y;				
 				people.get(i).boundingbox = bbs.get(minJ).clone();
 				bbs.remove(minJ);
 			}
+			else
+			{
+				lonely.add(people.get(i));
+			}
 		}
+	}
 
-	
 
-		
-		
+	public void attachLonelyToLonely(List<Rect> bbs, List<Person> lonely)
+	{
 		// try to attach lonely people to lonely bss 
 		for (int i = 0; i < lonely.size(); i++)
 		{
@@ -226,27 +201,12 @@ public class PersonCounter {
 
 				double d = d1+d2;
 				
-//				if(d1 < minD )
-//				{
-//					minD = (int)d1;
-//					minJ = j;
-//					found = true;
-//					//break;
-//				}
-//				if(d2 < minD )
-//				{
-//					minD = (int)d2;
-//					minJ = j;
-//					found = true;
-//					//break;
-//				}
+
 				if(d < minD )
 				{
-					System.out.println("         ATTCJED lonely");
 					minD = (int)d2;
 					minJ = j;
 					found = true;
-					//break;
 				}
 			}
 			if (found)
@@ -255,12 +215,13 @@ public class PersonCounter {
 				bbs.remove(minJ);
 				lonely.remove(i);
 			    Log.add("created");
-
-
 			}
 		}
-		
-		
+	}
+	
+	
+	public void removePeople(List<Person> lonely)
+	{
 		//remove people
 		for(int j = 0; j < lonely.size(); j++)
 		{
@@ -278,8 +239,12 @@ public class PersonCounter {
 				Log.add("removed");
 
 			}
-		}		
-	// create new people
+		}
+	}
+	
+	public void createNewPeople(List<Rect> bbs)
+	{
+		// create new people
 		for (int i = 0; i < bbs.size(); i++)
 		{
 			int dx1 = bbs.get(i).x;
@@ -297,16 +262,13 @@ public class PersonCounter {
 				p.boundingbox = bbs.get(i).clone();
 				people.add(p);
 				bbs.remove(i);
-			}
-			
+			}	
 		}
-		
-		return lonely;
-	}
+	}	
+
 	
 	
-	
-	public int processImage(Mat img)
+	public void processImage(Mat img)
 	{
 		this.current.orig = img.clone();
 		this.current.height = this.current.orig.rows();
@@ -332,28 +294,26 @@ public class PersonCounter {
 		// blur the image
 		Imgproc.GaussianBlur(this.current.grey, this.current.grey, new Size(this.filterSize, this.filterSize), 0);		
 		
-		// adapt background		
-//		for(int r = 0; r < this.current.grey.rows(); r++)
-//		{
-//			for(int c = 0; c < this.current.grey.cols(); c++)
-//			{
-//				if(this.current.grey.get(r, c)[0] > this.current.backgroundGrey.get(r, c)[0])
-//					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/100);
-//				else
-//					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/100);
-//			}
-//		}
+		if(cnt++ % 10 == 0)
+		{
+			// adapt background		
+			for(int r = 0; r < this.current.grey.rows(); r++)
+			{
+				for(int c = 0; c < this.current.grey.cols(); c++)
+				{
+					if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
+						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/100);
+					else
+						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/100);
+				}
+			}	
+		}
 		
 		//get difference			
 		Core.absdiff(this.current.grey, this.current.backgroundGrey, this.current.differenceGrey);
 		
 		//get thresholded-image
 		Imgproc.threshold(this.current.differenceGrey, this.current.foregroundBW, this.threshold, 255, Imgproc.THRESH_BINARY);
-		
-		
-	
-
-		return 0;
 	}
 	
 	
@@ -383,7 +343,6 @@ public class PersonCounter {
 			}
 		}
 		return bbs;
-		
 	}
 	
 	List<Rect> mergeBoundingBoxes(List<Rect> bbs)
@@ -403,7 +362,6 @@ public class PersonCounter {
 			
 			for(int j = 0; j < bbs.size(); j++)
 			{
-				//if(i == j) continue;
 				
 				Rect r2 = bbs.get(j);
 				if(r1.equals(r2)) 
@@ -415,33 +373,7 @@ public class PersonCounter {
 						r1.x + r1.width > r2.x /*&&
 						r1.y < r2.y + r2.height &&
 						r1.height + r1.y > r2.y*/) 
-				{
-//					try{
-//						if (rect1.area() > rect2.area())
-//							bbs.remove(j);
-//						else
-//							bbs.remove(i);
-//					}
-//					catch(Exception e)
-//					{
-//						
-//					}
-					
-					//if(r2.tl().y >= r1.tl().y && r2.br().y <= r1.br().y)
-//					if(r1.y < r2.y + r2.height &&
-//						r1.height + r1.y > r2.y)
-//					{
-//						
-//						System.out.println("continüüü");
-//						continue;
-//					}
-					
-//					if(Math.abs((double)(r2.br().x - r.x)) > 200)
-//					{
-//					
-//						System.out.println("continüüü");
-//						continue;
-//					}			
+				{		
 					
 					double thresh = .80;
 					double A1 = r1.area();
@@ -481,14 +413,9 @@ public class PersonCounter {
 					
 					bbs.remove(j);
 				}
-
-				
-				
-			}
-			
+	
+			}			
 		}
 		return bbs2;
 	}
-	
-
 }
