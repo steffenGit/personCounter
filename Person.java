@@ -1,5 +1,5 @@
 
-//package personCounter;
+package personCounter;
 
 import org.opencv.core.Rect;
 
