@@ -295,20 +295,20 @@ public class PersonCounter {
 		//Imgproc.GaussianBlur(this.current.grey, this.current.grey, new Size(this.filterSize, this.filterSize), 0);		
 		Imgproc.medianBlur(this.current.grey, this.current.grey, this.filterSize);
 		
-		if(cnt++ % 10 == 0)
-		{
-			// adapt background		
-			for(int r = 0; r < this.current.grey.rows(); r++)
-			{
-				for(int c = 0; c < this.current.grey.cols(); c++)
-				{
-					if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
-						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/10);
-					else
-						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/10);
-				}
-			}	
-		}
+//		if(cnt++ % 10 == 0)
+//		{
+//			// adapt background		
+//			for(int r = 0; r < this.current.grey.rows(); r++)
+//			{
+//				for(int c = 0; c < this.current.grey.cols(); c++)
+//				{
+//					if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
+//						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/10);
+//					else
+//						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/10);
+//				}
+//			}	
+//		}
 		
 		
 		//get difference			
