@@ -310,7 +310,6 @@ public class PersonCounter {
 //			}	
 //		}
 		
-		
 		//get difference			
 		Core.absdiff(this.current.grey, this.current.backgroundGrey, this.current.differenceGrey);
 		
