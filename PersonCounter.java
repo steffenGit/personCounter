@@ -50,25 +50,51 @@ public class PersonCounter {
 		
 		people = new ArrayList<Person>();
 	}
-	
+	/**
+	 * @return the current frame as greyscale image.
+	 */
 	public Mat getGrey(){
 		return this.current.grey;
 	}	
+	
+	/**
+	 * @return the current background reference-image
+	 */
 	public Mat getBackgroundGrey(){
 		return this.current.backgroundGrey;
 	}
+	
+	/**
+	 * @return the current difference image
+	 */
 	public Mat getDifferenceGrey(){
 		return this.current.differenceGrey;
 	}
+	
+	/**
+	 * @return the current thresholded difference image
+	 */
 	public Mat getForegroundBW(){
 		return this.current.foregroundBW;
 	}
+	
+	/**
+	 * @return get the final result image with boxes
+	 */
 	public Mat getResultColor(){
 		return this.current.resultColor;
 	}
 	
 	
-	
+	/**
+	 * The method serves as main counting method.
+	 * Provide a single frame and the programm will take it from there.
+	 * Call this method every frame and provide the current Mat.
+	 * Afterwards, use the getters above to retrieve the images.
+	 * 
+	 * @param img
+	 * @return
+	 */
 	public int count(Mat img)
 	{
 		// process the image, getting our ROIs
@@ -78,6 +104,8 @@ public class PersonCounter {
 		List<Rect> bbs;
 		List<Rect> bbsIntersected;
 		List<Person> lonely = new ArrayList<Person>();
+		
+		
 		// get the contours of all shapes, with threshold
 		contours = findContours(this.current, this.minArea);
 		Imgproc.drawContours(this.current.resultColor, contours, -1, new Scalar(255,128,128), 1);
@@ -102,6 +130,7 @@ public class PersonCounter {
 					new Scalar(255, 0,0),1);
 		}
 		
+		// do the tracking
 		attachBBStoPeopleList(bbsIntersected, lonely);
 		attachLonelyToLonely(bbsIntersected, lonely);
 		removePeople(lonely);
@@ -133,7 +162,16 @@ public class PersonCounter {
 		return 0;
 	}
 	
-	
+	/**
+	 * Attaches ROIs to known people.
+	 * All ROIs used here will be removed from the bbs-list.
+	 * All People that can not be attached to any ROI will be put into the lonely-list.
+	 * 
+	 * We loop over all known people and try to find the closest ROI within reach.
+	 * 
+	 * @param bbs the List of ROIS
+	 * @param lonely the list of lonely people. Is probably empty at this point.
+	 */
 	void attachBBStoPeopleList(List<Rect> bbs, List<Person> lonely) {
 		
 		
@@ -155,7 +193,6 @@ public class PersonCounter {
 				double d2 = Math.sqrt(dx2*dx2 + dy*dy);
 
 				double d = d1+d2;		
-				
 
 				if(d < minD)
 				{
@@ -179,7 +216,12 @@ public class PersonCounter {
 		}
 	}
 
-
+	/**
+	 * This method tries to attach lonely people to left over ROIS.
+	 * It basically increases the maxDistance for peopleattaching. 
+	 * @param bbs the List of leftover ROIS
+	 * @param lonely the list of lonely people
+	 */
 	public void attachLonelyToLonely(List<Rect> bbs, List<Person> lonely)
 	{
 		// try to attach lonely people to lonely bss 
@@ -220,6 +262,11 @@ public class PersonCounter {
 	}
 	
 	
+	/**
+	 * Removes lonely people if they are touching the boundaries of the image.
+	 * 
+	 * @param lonely
+	 */
 	public void removePeople(List<Person> lonely)
 	{
 		//remove people
@@ -237,11 +284,15 @@ public class PersonCounter {
 				people.remove(lonely.get(j));
 				lonely.remove(j);
 				Log.add("removed");
-
 			}
 		}
 	}
 	
+	/**
+	 * create new people and add them to the list, 
+	 * if we have a ROI at the boundaries of the image and no corresponding Person.
+	 * @param bbs
+	 */
 	public void createNewPeople(List<Rect> bbs)
 	{
 		// create new people
@@ -267,7 +318,12 @@ public class PersonCounter {
 	}	
 
 	
-	
+	/**
+	 * Processes the image, does the background substraction and creates 
+	 * the foregroundBW image needed for the counting mechanisms.
+	 *  
+	 * @param img the original image
+	 */
 	public void processImage(Mat img)
 	{
 		this.current.orig = img.clone();
@@ -317,7 +373,13 @@ public class PersonCounter {
 		Imgproc.threshold(this.current.differenceGrey, this.current.foregroundBW, this.threshold, 255, Imgproc.THRESH_BINARY);
 	}
 	
-	
+	/**
+	 * Finds the contours of ROIs within the foregroundBW image.
+	 * Stores and returns them if, if their area() is larger than minArea. 
+	 * @param f the current Frame.
+	 * @param minArea the minArea of the Contours.
+	 * @return the List of contours.
+	 */
 	List<MatOfPoint> findContours(Frame f, double minArea)
 	{
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();    
@@ -332,6 +394,12 @@ public class PersonCounter {
 		return contours;
 	}
 	
+	/**
+	 * Creates the Boundingboxes of the contours, if thei area() is larger than minSize.
+	 * @param contours List of the contours found by findContours(...)
+	 * @param minSize the minSize of the BoundingBoxes
+	 * @return the List of Boundingboxes
+	 */
 	List<Rect> findBoundingBoxes(List<MatOfPoint> contours, double minSize)
 	{
 		List<Rect> bbs = new ArrayList<Rect>();
@@ -344,8 +412,15 @@ public class PersonCounter {
 			}
 		}
 		return bbs;
-	}
+	}	
 	
+	/**
+	 * Merges all boundingboxes that are touching. If so, merge them
+	 * If their Sizedifference is less than 20%, dont merge them, to make sure people dont merge.
+	 * BUT: doesnt seem to be very practicle at the moment.
+	 * @param bbs List of Boundingboxes to merge
+	 * @return the List of Merged Boxes.
+	 */
 	List<Rect> mergeBoundingBoxes(List<Rect> bbs)
 	{
 		List<Rect> bbs2 = new ArrayList<Rect>();
@@ -370,12 +445,14 @@ public class PersonCounter {
 					continue;
 				}
 
+				// merge them, if they colide on the x-axis 
 				if (r1.x < r2.x + r2.width &&
 						r1.x + r1.width > r2.x /*&&
 						r1.y < r2.y + r2.height &&
 						r1.height + r1.y > r2.y*/) 
 				{		
 					
+					// step out of the loop, if the sizedifference is less that 20%.
 					double thresh = .80;
 					double A1 = r1.area();
 					double A2 = r2.area();
@@ -414,17 +491,26 @@ public class PersonCounter {
 					
 					bbs.remove(j);
 				}
-	
 			}			
 		}
 		return bbs2;
 	}
 	
+	/**
+	 * Sets the current Frame as reference-frame.
+	 * Usefull for the android-app to make adaption possible.
+	 * 
+	 */
 	public void setCurrentFrameAsReference()
 	{
-		Imgproc.cvtColor(this.current.orig, this.current.grey, Imgproc.COLOR_RGB2GRAY);
-		
+		Imgproc.cvtColor(this.current.orig, this.current.grey, Imgproc.COLOR_RGB2GRAY);		
 		// init images
 		this.current.backgroundGrey = this.current.grey.clone();
+	}
+	
+	
+	public void resetCounter()
+	{
+		this.people = new ArrayList<Person>();
 	}
 }

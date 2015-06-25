@@ -84,14 +84,23 @@ public class VideoRunnable implements Runnable{
 		this.frameRateTextField = frameRateTextField;
 		this.panel = panel;
 		m = new Mat();
-		vid = new VideoCapture(videoPath);
-//		vid = new VideoCapture(0);
-//		try {
-//			Thread.sleep(5000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		
+		if(!videoPath.equals(""))
+		{
+			vid = new VideoCapture(videoPath);	
+			
+		}
+		else
+		{
+			vid = new VideoCapture(0);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		if (vid.isOpened())
 		System.out.println("file loaded");
 		pc = new PersonCounter(threshold, minArea, maxDistance, filterSize, adaptionFactor, minBBsize);
@@ -118,6 +127,7 @@ public class VideoRunnable implements Runnable{
 		{
 			if(!stopped && vid.read(m))
 			{
+				System.gc();
 				int c = pc.count(m);
 				Mat img    = pc.getResultColor();
 				Mat imgFBW = pc.getForegroundBW();
@@ -205,6 +215,16 @@ public class VideoRunnable implements Runnable{
 	public void setMinBBsize(int minBBsize)
 	{
 		this.pc.minBBsize = minBBsize;
+	}
+	
+	public void setCurrentFrameAsReference()
+	{
+		this.pc.setCurrentFrameAsReference();
+	}
+	
+	public void resetCounter()
+	{
+		this.pc.resetCounter();
 	}
 	
 }

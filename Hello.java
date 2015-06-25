@@ -223,6 +223,13 @@ public class Hello
 	 */
 	private static JButton restartButton;
 	
+	private static JButton resetCounterButton;
+
+	/**
+	 * A button to set the current frame as backgroundimage
+	 */
+	private static JButton setBackgroundButton;
+	
 	/**
 	 * A label for the class member personCounterTextField.
 	 */
@@ -429,6 +436,36 @@ public class Hello
 			}
 		});
 		
+		
+		setBackgroundButton = new JButton("Set Frame ans Background");
+		setBackgroundButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Log.addSeperator();
+					Log.add("setting current Frame as Background");
+					videoRunnable.setCurrentFrameAsReference();
+				} catch (Exception e1) {
+					Log.add("Failed to close video. Try again!");
+				}
+			}
+		});
+		
+		
+		resetCounterButton = new JButton("Reset Counter");
+		resetCounterButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Log.addSeperator();
+					Log.add("resetting counter");
+					videoRunnable.resetCounter();
+				} catch (Exception e1) {
+					Log.add("Failed to close video. Try again!");
+				}
+			}
+		});
+		
 		/********************************************************************
 		 * Add all the components to the top level containers and then
 		 * add them to the window itself.
@@ -458,7 +495,8 @@ public class Hello
 		containerLeft.add(minBBsizeGui.getSlider());
 		containerLeft.add(playButton);
 		containerLeft.add(restartButton);
-		
+		containerLeft.add(setBackgroundButton);
+		containerLeft.add(resetCounterButton);
 		containerRight.add(Log.getComponent());
 		
 		containerCenter.add(panel);
