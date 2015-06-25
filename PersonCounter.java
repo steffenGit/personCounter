@@ -332,12 +332,12 @@ public class PersonCounter {
 		// blur the image
 		Imgproc.GaussianBlur(this.current.grey, this.current.grey, new Size(this.filterSize, this.filterSize), 0);		
 		
-//		// adapt background		
+		// adapt background		
 //		for(int r = 0; r < this.current.grey.rows(); r++)
 //		{
 //			for(int c = 0; c < this.current.grey.cols(); c++)
 //			{
-//				if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
+//				if(this.current.grey.get(r, c)[0] > this.current.backgroundGrey.get(r, c)[0])
 //					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/100);
 //				else
 //					this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/100);
