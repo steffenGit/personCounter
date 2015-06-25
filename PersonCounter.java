@@ -292,7 +292,8 @@ public class PersonCounter {
 
 		
 		// blur the image
-		Imgproc.GaussianBlur(this.current.grey, this.current.grey, new Size(this.filterSize, this.filterSize), 0);		
+		//Imgproc.GaussianBlur(this.current.grey, this.current.grey, new Size(this.filterSize, this.filterSize), 0);		
+		Imgproc.medianBlur(this.current.grey, this.current.grey, this.filterSize);
 		
 		if(cnt++ % 10 == 0)
 		{
@@ -302,9 +303,9 @@ public class PersonCounter {
 				for(int c = 0; c < this.current.grey.cols(); c++)
 				{
 					if(this.current.grey.get(r,  c)[0] > this.current.backgroundGrey.get(r, c)[0])
-						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/100);
+						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]+this.adaptionFactor/10);
 					else
-						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/100);
+						this.current.backgroundGrey.put(r, c, this.current.backgroundGrey.get(r, c)[0]-this.adaptionFactor/10);
 				}
 			}	
 		}
@@ -418,5 +419,13 @@ public class PersonCounter {
 			}			
 		}
 		return bbs2;
+	}
+	
+	public void setCurrentFrameAsReference()
+	{
+		Imgproc.cvtColor(this.current.orig, this.current.grey, Imgproc.COLOR_RGB2GRAY);
+		
+		// init images
+		this.current.backgroundGrey = this.current.grey.clone();
 	}
 }
