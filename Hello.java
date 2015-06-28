@@ -125,8 +125,8 @@ public class Hello
 	 * Default path to video you want to run the algorithm with. The video can be changed
 	 * at runtime by using the fileChooser. This path will set to chosen file.
 	 */
-	//private static final String videoPathDefault = "/home/jan/opencv_workspace/personCounter/leute.mp4";
-	private static final String videoPathDefault = "/home/stfn/dev/eclipse/labor.mp4";
+	private static final String videoPathDefault = "labor.mp4";
+	//private static final String videoPathDefault = "/home/stfn/dev/eclipse/labor.mp4";
 
 	/**
 	 * The JFrame used to show the program in.
